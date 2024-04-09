@@ -1,0 +1,53 @@
+
+1.select customerid from customerinteractions where dataused>(select avg(dataused) from customerinteractions) and month='March';
+
+2.select customerid from customerinteractions where dataused>(select avg(dataused) from customerinteractions) and month='March';
+
+3.select customerid from customerinteractions where dataused>(select avg(dataused) from customerinteractions) and month='March';
+
+4.select sum(unitssold)as total_units_sold_q1,sum(totalsalesamount) as total_sales_amount_q1 from  quarterlysales where quarter='q1';
+
+5.select ProductTypeID,quarter,max(totalsalesamount),max(unitssold) as total_unitsold 
+ from quarterlysales
+ group by quarter,ProductTypeID limit 1;
+
+6.select sum(totalsalesamount)/sum(unitssold)
+ from quarterlysales 
+where producttypeid=1 and quarter='q2';
+
+7.select region from sectorenergyconsumption 
+ where 
+ consumptionkwh>(select avg(consumptionkwh) from sectorenergyconsumption where month='march')
+ and energysource in('solar','wind')
+ and month='march';
+
+8. 
+select sectors from sectorenergyconsumption 
+ where 
+ consumptionkwh>(select avg(consumptionkwh) from sectorenergyconsumption where month='march')
+ and energysource in('solar','wind')
+ and month='march';
+
+
+9.
+select sum(ConsumptionKWh)
+ from sectorenergyconsumption 
+where month='february' and 
+energysource <> 'fossilfuels';
+
+select sum(ConsumptionKWh)
+ from sectorenergyconsumption 
+where month='february' and 
+energysource='fossilfuels';
+
+10.select customername from insuranceactivities where 
+feedbackscore>(select avg(feedbackscore)from insuranceactivities) 
+or claimscount>	(select avg(claimscount)from insuranceactivities)
+and investigation='no';
+
+11. select customername,sum(annualpremium) from insuranceactivities 
+where 
+feedbackscore>(select avg(feedbackscore)from insuranceactivities) 
+and claimscount>=1;
+
+12.select avg(feedbackscore) from insuranceactivities group by policytype;
