@@ -1,0 +1,68 @@
+ASSESSMENT 2
+1. select * from l1_maintenance_records;
+select machine_id,cost from l1_maintenance_records where cost>(select  avg(cost)  from l1_maintenance_records 
+where month(maintenance_Date)=3 
+group by month(maintenance_Date) );
+
+2.
+select maintenance_type,count(maintenance_type) 
+from l1_maintenance_records where month(maintenance_Date)=3 and year(maintenance_Date)=2024
+group by maintenance_type ; 
+
+3.
+select technician_name,count(technician_name),avg(cost) 
+from l1_maintenance_records where month(maintenance_Date)=3 and year(maintenance_Date)=2024
+group by technician_name ;
+
+4.
+select *,incident_count_pre_update-incident_count_post_update as reduction from l2_updates;
+select product_id,incident_count_pre_update,incident_count_post_update,
+incident_count_pre_update-incident_count_post_update as reduction from l2_updates;
+
+5.
+select update_id,product_id,user_feedback_score 
+from l2_updates where update_id is not null order by user_feedback_score 
+desc limit 1;
+
+6.
+select product_id,incident_count_pre_update,incident_count_post_update,
+incident_count_pre_update-incident_count_post_update as reduction 
+from l2_updates order by reduction limit 1;
+
+7.
+select a.patient_id,c.patient_name,a.facility_id,a.reason_for_visit 
+from l3_visits a join l3_visits b join l3_patients c on a.patient_id=c.patient_id 
+where a.patient_id=b.visit_id and a.facility_id<>b.facility_id
+and month(a.visit_date)=3 and year(a.visit_date)=2024;
+
+8.
+select a.facility_id,b.facility_name,count(a.facility_id) from l3_visits a 
+join l3_facilities b on a.facility_id=b.facility_id
+where a.reason_for_visit='Emergency' and month(a.visit_date)=3 
+and year(a.visit_date)=2024
+group by a.facility_id,b.facility_name;
+
+9.
+select insurance_provider from l3_patients where patient_id=(select patient_id from l3_visits 
+where visit_id=(select  visit_id from l3_treatments where outcome='Complicated')
+and month(visit_date) in(1,2,3,4) and year(visit_date)=2024); 
+
+10.
+select distinct t.product_id,t.category,t.total_q from(select a.product_id,b.category,sum(a.quantity)as total_q 
+from l4_sales a join l4_products b on a.product_id=b.product_id 
+group by a.product_id order by total_q desc)t 
+join
+(select a.product_id,b.category,sum(a.quantity)as total_q 
+from l4_sales a join l4_products b on a.product_id=b.product_id 
+group by a.product_id order by total_q desc)t1 on t.category =t1.category
+where t.category=t1.category and t.total_q>t1.total_q;
+
+11.
+select a.product_id,c.region,sum(a.price)as total_sum from  l4_products a 
+join l4_sales b on a.product_id=b.product_id
+ join l4_stores c on b.store_id=c.store_id 
+ where month(b.sale_Date) in(1,2,3,4) and year(b.sale_date)=2024
+ group by c.region,a.product_id order by total_sum desc limit 1;  
+
+12.
+select * from l4_products where product_id=(select product_id from l4_sales where quantity=0); 
