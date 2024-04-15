@@ -1,0 +1,125 @@
+Riddhi Bhowmick final assessment
+
+1.
+select product_id,avg(sales_amount) 
+from sales_records 
+where datediff(curdate(),sales_date)<30 
+group by product_id;  
+
+2.
+select product_id,avg(sales_amount)as average_sales ,
+rank() over(order by avg(sales_amount)desc)as rank_details
+from sales_records
+where year(sales_date)=year(curdate()) 
+group by product_id limit 3;  
+
+3.
+with customer_data as(select customer_id,sum(sales_amount)as total_sales ,
+(sum(sales_amount)/(select sum(sales_amount)from sales_records)*100) as percentage,
+rank() over(order by avg(sales_amount)desc)as rank_details
+from sales_records
+-- where year(sales_date)=year(curdate()) 
+group by customer_id) 
+select a.customer_id,b.customer_name,a.total_sales,a.percentage,a.rank_details 
+from customer_data a  join customers b on a.customer_id=b.customer_id;
+
+4.
+select *,month(curdate())-month(sales_date)<4 from sales_records;
+select customer_id,count(customer_id),
+case 
+when count(customer_id)>=4 and month(sales_date)
+in(month(curdate())-1, month(curdate())-2, month(curdate())-3, month(curdate())-4) 
+then "consistent buyers"
+else "occasional buyers"
+end as buyer_Status
+from sales_records group by customer_id ;
+
+5.
+select a.arrival_airport,b.departure_airport,avg(c.ticket_price) 
+from flights a join flights b on a.departure_airport=b.arrival_airport join tickets c on c.flight_id=b.flight_id;
+
+6.
+select a.flight_number,a.departure_date,b.flight_id,
+count(b.flight_id)total_passengers from tickets b join flights a 
+on a.flight_id=b.flight_id 
+group by a.flight_id order by total_passengers desc;
+
+7.
+select a.passenger_id,b.passenger_name,b.frequent_flyer_status,
+sum(a.ticket_price)as total_price from tickets a
+join passengers b on a.passenger_id=b.passenger_id 
+ group by  a.passenger_id
+order by total_price desc limit 5;
+
+8.
+select month(ticket_date)as month_details,count(month(ticket_date))as highest_ticket_sold
+from tickets group by month_details;
+
+9.
+select player_id,game_id,score/60 as mins_played,
+count(player_id)from playerscores group by player_id,game_id 
+order by mins_played desc;
+
+10.select a.game_id,b.game_name,count(a.game_id)as total_players_played 
+from playerscores a join games b on a.game_id=b.game_id 
+group by a.game_id order by total_players_played desc limit 3;
+
+11.
+select a.game_id,b.game_name,count(a.game_id)as total_players_played,
+avg(a.score)as total_score,max(a.score)max_Score 
+from playerscores a join games b on a.game_id=b.game_id 
+group by a.game_id order by total_score desc;
+
+12.
+with game_churn as(select b.player_name,b.registration_date,
+datediff(curdate(),a.play_date)<30 as 30_days_period,
+datediff(curdate(),play_date)<60 60_days_period from playerscores a 
+join players b 
+on a.player_id=b.player_id)
+select * from game_churn where 30_days_period=0 and 60_days_period<>0;
+
+13.
+select a.doctor_id,b.doctor_name,sum(a.cost)as total_cost  
+from treatments  a  join doctors b on a.doctor_id=b.doctor_id
+group by a.doctor_id 
+order by total_cost desc limit 5;
+
+14.
+select treatment_name, sum(cost)t_cost,sum(cost)/(select sum(cost)from treatments)*100 as percentage
+ from treatments 
+group by treatment_name order by t_cost desc; 
+
+15.
+select a.patient_id,a.patient_name,a.admission_date,b.discharge_date from patients a 
+join patients b on a.patient_id=b.patient_id
+ where datediff(a.admission_date,b.discharge_date)<30 and a.admission_date<>b.admission_date
+ order by a.admission_date asc;
+
+16.
+
+select patient_id,gender,diagnosis,patient_name,admission_date,discharge_date,
+datediff(admission_date,discharge_date)as los from patients;
+
+17.
+select a.course_id,a.semester,b.department,avg(a.grade)as avg_grade from enrollments a
+right join courses b on b.course_id=a.course_id
+group by a.course_id ;
+
+18.select a.course_id,b.course_name,count(a.course_id)total from enrollments a join courses b 
+on b.course_id=a.course_id 
+group by course_id order by total desc;
+
+19.
+select c.student_name,b.course_name,b.semester,b.student_id,sum(credits) t_credits from courses a join enrollments b 
+on a.course_id=b.course_id
+join students c 
+on c.student_id=b.student_id group by b.student_id; 
+
+20.
+select a.course_id,b.course_name,count(a.course_id)t_count 
+from enrollments  a join courses b on b.course_id=a.course_id
+group by a.course_id  order by t_count limit 3;
+
+
+
+
